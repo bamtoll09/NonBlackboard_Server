@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 
 from pprint import pprint   # for pretty print
 import re # for regex
@@ -13,7 +14,11 @@ import datetime
 import time
 
 def connect(id, pw):
-    browser = webdriver.Chrome(service= Service(ChromeDriverManager().install()))
+    options = Options()
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+
+    browser = webdriver.Chrome(service= Service(ChromeDriverManager().install()), options=options)
 
     url = 'https://kulms.korea.ac.kr/auth-saml/saml/login?apId=_147_1&redirectUrl='
     browser.get(url)
@@ -55,7 +60,7 @@ def connect(id, pw):
                 print('Alert accepted')
                 return (404, "There is no information about your account on database.")
             except Exception as e:
-                print(e)
+                # print(e)
                 print('There is no alert.')
 
             print('4')
