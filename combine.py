@@ -15,30 +15,30 @@ import time
 
 def connect(id, pw):
     options = Options()
-    options.add_argument('--headless')
-    options.add_argument('--no-sandbox')
+    #options.add_argument('--headless')
+    #options.add_argument('--no-sandbox')
+    #options.add_argument("--window-size=1920,1080")
 
     browser = webdriver.Chrome(service= Service(ChromeDriverManager().install()), options=options)
 
     url = 'https://kulms.korea.ac.kr/auth-saml/saml/login?apId=_147_1&redirectUrl='
     browser.get(url)
 
-    print('1')
-
-    print('2')
+    print('Connecting Website...');
 
     try:
         time.sleep(4)
 
         if browser.current_url.startswith('https://sso.korea.ac.kr/saml/Auth.do'):
-            print('waiting')
+            print('Waiting Website...')
 
             WebDriverWait(browser, 30).until(
                 EC.presence_of_element_located(
                     (By.ID, 'password')
                 )
             )
-            print('3')
+
+            print('Logging in...');
 
             one_id = browser.find_element(By.ID, 'one_id')
             password = browser.find_element(By.ID, 'password')
@@ -51,29 +51,31 @@ def connect(id, pw):
             time.sleep(0.3)
 
             submit[0].click()
-
             time.sleep(0.3)
+
+            print("Login Success!");
 
             try:
                 alert_result = browser.switch_to.alert
                 alert_result.accept()
                 print('Alert accepted')
-                return (404, "There is no information about your account on database.")
+                return (202, "There is no information about your account on database.")
             except Exception as e:
                 # print(e)
                 print('There is no alert.')
 
-            print('4')
-
-            print('5')
+            print("Waiting Streams...");
 
             time.sleep(13)
+
+            print("Getting Streams...");
 
             # crawlling.py
             nameList = []
             titleList = []
             contentList = []
             clockList = []
+            linkList = []
             result = {}
 
             soup = BeautifulSoup(browser.page_source, 'html.parser')
@@ -118,8 +120,14 @@ def connect(id, pw):
 
                 clockList.append(whole)
 
+            links = soup.select('.js-title-link')
+
+            for link in links:
+                link['href'] = link['href'].replace('ultra/', 'ultra/courses').replace('/outline', '/cl/outline')
+                linkList.append(link['href'])
+
             for i in range(len(clockList)):
-                result[clockList[i]] = [nameList[i], titleList[i], contentList[i]]
+                result[clockList[i]] = [nameList[i], titleList[i], contentList[i], linkList[i]]
 
             msg = json.dumps(result, ensure_ascii=False)
 
@@ -132,12 +140,10 @@ def connect(id, pw):
             return (200, msg)
         
         else:
-            return (404, 'Error')
+            return (202, 'Error')
 
     except Exception as e:
         print('Error', e)
 
     finally:
         browser.quit()
-
-# connect(ID, PASSWORD + '0')
