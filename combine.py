@@ -114,10 +114,17 @@ def connect(id, pw):
 
                 # Is there a gap of event
                 if re.search('[A-z가-힣]', date):
-                    pattern  = re.compile(r'[A-z가-힣]+')
+                    pattern  = re.compile(r'[A-z가-힣]+\s?')
                     match = re.search(pattern, date).group()
 
-                    time_before = int(date[:date.find(match)])
+                    time_before = 1
+
+                    # "한 시간"
+                    if match == "한 ":
+                        match = date[2:]
+                    else:
+                        time_before = int(date[:date.find(match)])
+
                     delta = datetime.timedelta()
 
                     if match == "초":
@@ -139,7 +146,11 @@ def connect(id, pw):
                 
                 whole = datetime.datetime.strptime(whole, "%Y. %m. %d. %H:%M").strftime('%Y. %m. %d. %H:%M')
 
-                print(whole)
+                # 중복 시간 (초를 추가해야 할 거 같다)
+                # if whole in clockList:
+                #     whole += f"({clockList.count(whole) + 1})"
+
+                # print(whole)
 
                 clockList.append(whole)
 
