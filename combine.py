@@ -13,6 +13,8 @@ import json
 import datetime
 import time
 
+KST = datetime.timezone(datetime.timedelta(hours=9))
+
 def connect(id, pw):
     options = Options()
     #options.add_argument('--headless')
@@ -126,9 +128,9 @@ def connect(id, pw):
                         delta = datetime.timedelta(hours=time_before)
                         pass
                     else:
-                        print("Unknown word: " + match)                 
+                        print("Unknown word: " + match)
 
-                    date = (datetime.datetime.now() - delta).strftime('%Y. %m. %d.')
+                    date = (datetime.datetime.now(KST) - delta).strftime('%Y. %m. %d.')
 
                 stime = clock.select_one('.time').text.strip()
                 whole = date + ' ' + stime
