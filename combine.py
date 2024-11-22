@@ -22,6 +22,8 @@ def connect(id, pw):
     #options.add_argument("--window-size=1920,1080")
 
     browser = webdriver.Chrome(service= Service(ChromeDriverManager().install()), options=options)
+    tz_params = {'timezoneId': 'Asia/Seoul'}
+    browser.execute_cdp_cmd('Emulation.setTimezoneOverride', tz_params)
 
     url = 'https://kulms.korea.ac.kr/auth-saml/saml/login?apId=_147_1&redirectUrl='
     browser.get(url)
