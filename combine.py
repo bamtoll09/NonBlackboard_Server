@@ -101,15 +101,34 @@ def connect(id, pw):
                 text = ' '.join(div.text.replace("\n", " ").replace("\xa0", "/").split())
                 contentList.append(text)
             
-            pprint(contentList)
+            # pprint(contentList)
 
             clocks = soup.select('.js-split-datetime')
             
             for clock in clocks:
                 date = clock.select_one('.date').text.strip()
 
+                # Is there a gap of event
                 if re.search('[A-z가-힣]', date):
-                    date = datetime.date.today().strftime('%Y. %m. %d.')
+                    pattern  = re.compile(r'[A-z가-힣]+')
+                    match = re.search(pattern, date).group()
+
+                    time_before = int(date[:date.find(match)])
+                    delta = datetime.timedelta()
+
+                    if match == "초":
+                        delta = datetime.timedelta(seconds=time_before)
+                        pass
+                    elif match == "분":
+                        delta = datetime.timedelta(minutes=time_before)
+                        pass
+                    elif match == "시간":
+                        delta = datetime.timedelta(hours=time_before)
+                        pass
+                    else:
+                        print("Unknown word: " + match)                 
+
+                    date = (datetime.datetime.now() - delta).strftime('%Y. %m. %d.')
 
                 stime = clock.select_one('.time').text.strip()
                 whole = date + ' ' + stime
@@ -131,11 +150,11 @@ def connect(id, pw):
 
             msg = json.dumps(result, ensure_ascii=False)
 
-            print('6')
+            # print('6')
 
-            print(msg)
+            # print(msg)
 
-            print('7')
+            # print('7')
 
             return (200, msg)
         
@@ -147,3 +166,7 @@ def connect(id, pw):
 
     finally:
         browser.quit()
+        
+if __name__ == '__main__':
+    import account
+    connect(account.ID, account.PW)
