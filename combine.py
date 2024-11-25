@@ -75,6 +75,7 @@ def connect(id, pw):
             print("Getting Streams...");
 
             # crawlling.py
+            idList = []
             nameList = []
             titleList = []
             contentList = []
@@ -83,6 +84,14 @@ def connect(id, pw):
             result = {}
 
             soup = BeautifulSoup(browser.page_source, 'html.parser')
+
+            element_ids = soup.select('div.element-details')
+
+            for elem_id in element_ids:
+                id = json.loads(elem_id['analytics-context'])['id']
+                idList.append(id)
+
+            # pprint(idList)
 
             course_name = soup.select('li.notification-default')
 
@@ -97,6 +106,8 @@ def connect(id, pw):
             for div in title:
                 text = div.text.strip()
                 titleList.append(text)
+
+            pprint(titleList)
 
             content = soup.select('div.content')
             # print(content[7].text.strip().replace("\n", " "))
@@ -146,10 +157,6 @@ def connect(id, pw):
                 
                 whole = datetime.datetime.strptime(whole, "%Y. %m. %d. %H:%M").strftime('%Y. %m. %d. %H:%M')
 
-                # 중복 시간 (초를 추가해야 할 거 같다)
-                # if whole in clockList:
-                #     whole += f"({clockList.count(whole) + 1})"
-
                 # print(whole)
 
                 clockList.append(whole)
@@ -160,8 +167,8 @@ def connect(id, pw):
                 link['href'] = link['href'].replace('ultra/', 'ultra/courses').replace('/outline', '/cl/outline')
                 linkList.append(link['href'])
 
-            for i in range(len(clockList)):
-                result[clockList[i]] = [nameList[i], titleList[i], contentList[i], linkList[i]]
+            for i in range(len(idList)):
+                result[idList[i]] = [clockList[i], nameList[i], titleList[i], contentList[i], linkList[i]]
 
             msg = json.dumps(result, ensure_ascii=False)
 

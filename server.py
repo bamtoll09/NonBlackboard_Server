@@ -18,7 +18,7 @@ def login():
     id = datas['id'].strip()
     pw = datas['pw'].strip()
 
-    print(datas)
+    # print(datas)
 
     if id == '' or pw == '':
         return Response("ID or Password can not be empty!", status=202, content_type="text/plain; charset=utf-8")
